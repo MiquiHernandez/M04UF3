@@ -21,6 +21,19 @@ const config = {
 const game = new Phaser.Game(config);
 
 let player;
+let player_speed= 2;
+
+let enemies = [];
+let enemies_padding= 128;
+let enemies_pos = [
+{x: enemies_padding,y: enemies_padding},
+{x: config.width/2,y: enemies_padding},
+{x:config.width -enemies_padding,y: enemies_padding},
+
+{x:config.width -enemies_padding, y: config.height - enemies_padding},
+
+
+]
 
 let key_left;
 let key_right;
@@ -47,17 +60,17 @@ function crear ()
 function actualiza ()
 {
 		if(key_left.isDown){
-			player.x -= 1;
+			player.x -= player_speed;
 		}
 		else if(key_right.isDown){
-			player.x += 1;
+			player.x += player_speed;
 		}
 
 		if(key_up.isDown){
-			player.y -= 1;
+			player.y -= player_speed;
 		}
 		else if(key_down.isDown) {
-			player.y += 1;
+			player.y += player_speed;
 		}
 
 }
