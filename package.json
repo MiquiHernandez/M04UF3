@@ -1,0 +1,19 @@
+{
+  "name": "enti_survivors",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MiquiHernandez/M04UF3.git"
+  },
+  "author": "Miqui",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/MiquiHernandez/M04UF3/issues"
+  },
+  "homepage": "https://github.com/MiquiHernandez/M04UF3#readme"
+}
