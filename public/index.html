@@ -32,6 +32,9 @@ const game = new Phaser.Game(config);
 let player;
 let player_speed= 2;
 
+let sword;
+
+let enemies_max = 28;
 let enemies = [];
 let enemies_padding= 128;
 let enemies_pos = [
@@ -58,7 +61,12 @@ let key_down;
 
 function precarga ()
 {
+	this.load,image("bg-img", "img/background.png");
 	this.load.image("player-img", "player.png");
+
+	for(let i = 1; i <=enemies_max;i++){
+this.load.image("enemy"+"1","img/enemy"+i+".png");
+	}
 }
 
 
@@ -66,6 +74,8 @@ function crear ()
 {
 
 	player = this.add.image(config.width/2, config.height/2, "player-img");
+	let bg = this.add.image(player.x,player.y,"bg-img");
+	
 
 	this.physics.add.existing(player,false);
 	player.body.setCollideWorldBounds (true);
@@ -75,10 +85,20 @@ function crear ()
 
 		this.physics.add.existing(enemies[i], false);
 		enemies[i].body.setCollideWorldBounds(true);
-		
-	}
+	}	
+		for(let i = 0; i < enemies_pos.length;i++){
+			let enemy = "enemy"+Math.floor(Math.random()*enemies_max+1);
 
-	  this.physics.add.collider(player, enemies);
+			let e = this.add.imae(enemies_pos[i].x, enemies_pos[i].y, enemy)
+			enemies.push(e);
+
+			this physics.add.existing(e, false);
+			e.body.setCollideWorldBounds(true);
+		}
+	
+
+	this.physics.add.collider(player, enemies);
+	this.physics.add.collider(enemies, enemies);
 
 	key_left = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
 	key_right = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
@@ -86,7 +106,22 @@ function crear ()
 	key_down = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
 }
 
+function Attack ()
+{
+	sword.x = player.x;
+	sword.y = player.y;
+	SetTimeOut(' ',2000);
+}
 
+setInterval(function()
+{
+	weapon.visible = true;
+	
+	setTimeout(function(){
+		weapon.visible = false;
+	}, 400;
+
+}, 2000;
 function actualiza ()
 {
 		if(key_left.isDown){
@@ -107,7 +142,7 @@ function actualiza ()
 		{
 			this.physics.moveToObject(enemies[i],player, 50)
 		}
-
+		SetInterval(Attack);
 }
 
 
