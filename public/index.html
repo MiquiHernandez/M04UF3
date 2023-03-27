@@ -8,6 +8,20 @@
 </head>
 <body>
 <h1>ENTI Survivors</h1>
+
+<form>
+
+<p><label>Difficulty:</label> </p>
+<ul>
+<li><input type="radio" name="difficult" value="easy" id="easy" /> <label for="easy">Easy</label></li>
+<li><input type="radio" name="difficult" value="medium" id="medium" checked/> <label for="medium">Medium</label></li>
+<li><input type="radio" name="difficult" value="hard" id="hard" /> <label for="hard">Hard</label></li>
+</ul>
+
+<input type="button" id="playGame" value="Play" onclick="Game(); return false;"/>
+
+</form>
+
 <script>
 
 const config = {
@@ -37,6 +51,8 @@ let sword;
 let enemies_max = 28;
 let enemies = [];
 let enemies_padding= 128;
+
+
 let enemies_pos = [
 {x: enemies_padding,y: enemies_padding},
 {x: config.width/2,y: enemies_padding},
@@ -53,11 +69,29 @@ let enemies_pos = [
 
 ];
 
+let score = 0;
+let scoretext;
+
+let timer = 0;
+let timertext;
+
+
 
 let key_left;
 let key_right;
 let key_up;
 let key_down;
+
+function ChooseDifficult()
+{
+	let chooseDif = document.getElementsByName("difficulty");
+
+	for (let i = 0; i < 3; i++) {
+		if (chooseDif[i].checked) {
+			return chooseDif[i].id;
+		}
+	}	
+}
 
 function precarga ()
 {
@@ -65,8 +99,9 @@ function precarga ()
 	this.load.image("player-img", "player.png");
 
 	for(let i = 1; i <=enemies_max;i++){
-this.load.image("enemy"+"1","img/enemy"+i+".png");
+		this.load.image("enemy"+i,"img/enemy"+i+".png");
 	}
+		this.load.image("bate", "imgs/bat_metal.png");
 }
 
 
@@ -74,29 +109,16 @@ function crear ()
 {
 
 	player = this.add.image(config.width/2, config.height/2, "player-img");
-	let bg = this.add.image(player.x,player.y,"bg-img");
+	let bg = this.add.image(config.width/2, config.height/2, "bg-img");
 	
 
 	this.physics.add.existing(player,false);
 	player.body.setCollideWorldBounds (true);
  
-	for(let i = 0; i < enemies_pos.length;i++){
-		enemies.push(this.add.image(enemies_pos[i].x, enemies_pos[i].y, "player-img"));
-
-		this.physics.add.existing(enemies[i], false);
-		enemies[i].body.setCollideWorldBounds(true);
-	}	
-		for(let i = 0; i < enemies_pos.length;i++){
-			let enemy = "enemy"+Math.floor(Math.random()*enemies_max+1);
-
-			let e = this.add.imae(enemies_pos[i].x, enemies_pos[i].y, enemy)
-			enemies.push(e);
-
-			this physics.add.existing(e, false);
-			e.body.setCollideWorldBounds(true);
-		}
+	weapon = this.add.image(config.width/2-48, config.height/2, "bate");
+	this.physics.add.existing(weapon, false);
+	weapon.visible = false;
 	
-
 	this.physics.add.collider(player, enemies);
 	this.physics.add.collider(enemies, enemies);
 
@@ -104,14 +126,35 @@ function crear ()
 	key_right = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
 	key_up = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
 	key_down = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
+	
+	scoretext = this.add.text(24, 24, "Score: 0", {font: '600 32px Arial', color: '#ffffff'});	
+	timertext = this.add.text(3 * config.width / 4, 24, "Time: 0", {font: '600 32px Arial', color: '#ffffff'});
+	
+	gb = this
 }
 
-function Attack ()
+let last_direction = "Left";
+
+let last_x = config.width/2;
+let last_y = config.width/2;
+
+function Game() 
 {
-	sword.x = player.x;
-	sword.y = player.y;
-	SetTimeOut(' ',2000);
-}
+	difficulty = ChooseDifficulty();
+
+	setInterval(() => {
+		weapon.visible = true;
+		gb.physics.world.enable(weapon);
+		setTimeout(() => {
+			weapon.visible = false;
+			gb.physics.world.disable(weapon);
+		}, 500);
+	}, 2000);
+	
+	setInterval(() => {	
+		timer++;
+		timer_text.setText("Time: " + timer);
+	}, 1000);
 
 setInterval(function()
 {
@@ -122,29 +165,114 @@ setInterval(function()
 	}, 400;
 
 }, 2000;
+
+setInterval(() => {
+		switch(difficult) {
+			case "easy":
+				for (let i = 0; i < 2; i++) {
+					let enemy = "enemy"+Math.floor(Math.random()*enemies_max+1);
+
+					let e = gb.add.image(enemies_pos[i].x, enemies_pos[i].y, enemy)
+					enemies.push(e);
+
+					gb.physics.add.existing(e, false);
+				}
+					break;
+
+			case "medium":
+				for (let i = 0; i < 5; i++) {
+					let enemy = "enemy"+Math.floor(Math.random()*enemies_max+1);
+
+					let e = gb.add.image(enemies_pos[i].x, enemies_pos[i].y, enemy)
+					enemies.push(e);
+
+					gb.physics.add.existing(e, false);
+				}
+					break;
+
+			case "hard":
+				for (let i = 0; i < 10; i++) {
+					let enemy = "enemy"+Math.floor(Math.random()*enemies_max+1);
+
+					let e = gb.add.image(enemies_pos[i].x, enemies_pos[i].y, enemy)
+					enemies.push(e);
+
+					gb.physics.add.existing(e, false);
+				}
+					break;
+		}
+	}, 5000);
+} 
 function actualiza ()
 {
 		if(key_left.isDown){
 			player.x -= player_speed;
+			
+			last_x = player.x;
+		last_y = player.y;
+		last_dir = "Left";
 		}
 		else if(key_right.isDown){
 			player.x += player_speed;
+			
+			last_x = player.x;
+		last_y = player.y;
+		last_dir = "Right";
 		}
 
 		if(key_up.isDown){
 			player.y -= player_speed;
+			
+			last_x = player.x;
+		last_y = player.y;
+		last_dir = "Up";
 		}
 		else if(key_down.isDown) {
 			player.y += player_speed;
+			
+			last_x = player.x;
+		last_y = player.y;
+		last_dir = "Down";
 		}
+		
+switch(last_direction){
+		case "Left":
+			weapon.x = player.x - 48;
+			weapon.y = player.y;
+			weapon.rotation = 180*Math.PI/180;
+			break;
+		case "Right":
+			weapon.x = player.x + 48;
+			weapon.y = player.y;
+			weapon.rotation = 0;
+			break;
+		case "Up":
+			weapon.x = player.x;
+			weapon.y = player.y - 48;
+			weapon.rotation = 270*Math.PI/180;
+			break;
+		case "Down":
+			weapon.x = player.x;
+			weapon.y = player.y + 48;
+			weapon.rotation = 90*Math.PI/180;
+			break;
+	}
 
-		for (let i = 0; i < enemies_pos.length; i++)
-		{
-			this.physics.moveToObject(enemies[i],player, 50)
+
+		for (let i = 0; i < enemies.length; i++){
+		this.physics.moveToObject(enemies[i], player);		
+	
+			if (this.physics.collide(weapon, enemies[i])) {
+				
+				enemies[i].visible = false;
+				this.physics.world.disable(enemies[i]);
+				
+				scoretext.text = ++score; 
+				scoretext.setText("Score: " + score);
+				
 		}
-		SetInterval(Attack);
+	}
 }
-
 
 
 
